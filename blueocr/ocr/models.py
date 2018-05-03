@@ -5,6 +5,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.conf import settings
 from celery import current_app
+from blueocr.ocr.utils import get_swift_token
 import urllib.request
 import os
 import uuid
@@ -18,6 +19,14 @@ class OcrDocument(models.Model):
     document_url = models.URLField(blank=False)
     callback_url = models.URLField(blank=True)
     priority = models.IntegerField(default=10, blank=False)
+
+    METHOD_SWIFT = "swift"
+    METHOD_PLAIN = "plain"
+    METHOD_TYPE = (
+        (METHOD_PLAIN, 'Plain'),
+        (METHOD_SWIFT, 'Swift')
+    )
+    method = models.CharField(max_length=20, choices=METHOD_TYPE, default=METHOD_PLAIN)
     state = FSMField(default='created')
     created = models.DateTimeField(auto_now_add=True, editable=False)
     updated = models.DateTimeField(auto_now=True)
@@ -34,8 +43,19 @@ class OcrDocument(models.Model):
 
     def download(self):
         download_dir = settings.TEMP_DOWNLOADS
-        download_file, h = urllib.request.urlretrieve(self.document_url, os.path.join(download_dir, "temp-{}".format(self.id)))
-        return download_file
+        if self.method == OcrDocument.METHOD_SWIFT:
+            token = get_swift_token()
+            print(token)
+            opener = urllib.request.build_opener()
+            opener.addheaders = [('X-Auth-Token', token)]
+            urllib.request.install_opener(opener)
+        try:
+            download_file, h = urllib.request.urlretrieve(self.document_url, os.path.join(download_dir, "temp-{}".format(self.id)))
+        except Exception as e:
+            logger.info("Error while downloading file - {}".format(e))
+            return None
+        else:
+            return download_file
 
     @transition(field=state, source='created', target='processed', on_error='error')
     def enter_processed(self):

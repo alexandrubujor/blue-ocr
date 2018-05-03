@@ -35,9 +35,10 @@ coverage==4.5.1
 django-storages==1.6.6
 boto3==1.7.9
 
-
 celery==4.1.0
 
 django-fsm==2.6.0
 
 PassportEye==1.2.0
+
+python-keystoneclient==3.16.0

@@ -38,3 +38,20 @@ def convert_to_image(download_file):
         return download_file
     logger.info("Conversion to tiff completed for {}".format(tiff_image))
     return tiff_image
+
+
+def get_swift_token():
+    from keystoneauth1.identity import v3
+    from keystoneauth1 import session
+
+    auth_url = settings.SWIFT_KEYSTONE_URL
+    username = settings.SWIFT_USERNAME
+    password = settings.SWIFT_PASSWORD
+    project_name = settings.SWIFT_PROJECT_NAME
+    user_domain_id = settings.SWIFT_USER_DOMAIN
+    project_domain_id = settings.SWIFT_PROJECT_DOMAIN
+    auth = v3.Password(auth_url=auth_url, username=username, password=password,
+                       project_name=project_name, user_domain_id=user_domain_id, project_domain_id=project_domain_id)
+    sess = session.Session(auth=auth)
+    token = auth.get_token(sess)
+    return token

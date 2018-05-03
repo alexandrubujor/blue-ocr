@@ -12,6 +12,13 @@ class Common(Configuration):
     TEMP_DOWNLOADS = "/tmp/"
     CONVERT_SHELL = "/Users/alexandru.bujor/work/bluedrive/ocr/convert.sh"
 
+    SWIFT_USERNAME = "admin"
+    SWIFT_PASSWORD = "8b3ab15057804129"
+    SWIFT_PROJECT_NAME = "admin"
+    SWIFT_USER_DOMAIN = "default"
+    SWIFT_PROJECT_DOMAIN = "default"
+    SWIFT_KEYSTONE_URL = "http://5.154.188.179:5000/v3/"
+
     INSTALLED_APPS = (
         'django.contrib.admin',
         'django.contrib.auth',

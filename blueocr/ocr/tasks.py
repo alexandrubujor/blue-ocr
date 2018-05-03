@@ -21,7 +21,7 @@ def scan_document(document_id):
         download_file = doc.download()
         logger.info("Downloaded file to {}".format(download_file))
     except Exception as e:
-        logger.warning("Couldn't download file {} - {}".format(download_file, e))
+        logger.warning("Couldn't download file - {}".format(e))
         doc.enter_failed()
         doc.save()
         OcrResult.objects.create(ocr_document=doc, state='failed', scanned_data={})
@@ -54,7 +54,7 @@ def scan_document(document_id):
 def send_callback(document_id):
     doc = OcrDocument.objects.get(id=document_id)
     result = OcrResult.objects.get(ocr_document=doc)
-    if doc.callback_url is None:
+    if doc.callback_url is None or doc.callback_url is "":
         logger.info("No callback to be executed for {}".format(doc))
         return
     json_data = serializers.serialize('json', [result,])
