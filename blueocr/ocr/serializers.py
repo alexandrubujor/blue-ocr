@@ -7,7 +7,7 @@ class OcrDocumentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OcrDocument
-        fields = ('id', 'document_url', 'callback_url', 'priority', 'state', 'result', 'created', 'updated')
+        fields = ('id', 'document_url', 'callback_url', 'method', 'priority', 'state', 'result', 'created', 'updated')
         read_only_fields = ('id', 'state', 'result', 'created', 'updated')
 
     def get_result(self, obj):
