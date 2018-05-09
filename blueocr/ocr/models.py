@@ -14,12 +14,26 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+class OcrResult(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    scanned_data = JSONField()
+    state = FSMField(default='created')
+    created = models.DateTimeField(auto_now_add=True, editable=False)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "OCR Result"
+        verbose_name_plural = "OCR Results"
+
+    def __str__(self):
+        return '{}'.format(self.id)
+
+
 class OcrDocument(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     document_url = models.URLField(blank=False)
     callback_url = models.URLField(blank=True)
-    priority = models.IntegerField(default=10, blank=False)
-
+    priority = models.IntegerField(default=10, blank=True)
     METHOD_SWIFT = "swift"
     METHOD_PLAIN = "plain"
     METHOD_TYPE = (
@@ -27,6 +41,7 @@ class OcrDocument(models.Model):
         (METHOD_SWIFT, 'Swift')
     )
     method = models.CharField(max_length=20, choices=METHOD_TYPE, default=METHOD_PLAIN)
+    ocr_result = models.ForeignKey(OcrResult, on_delete=models.SET_NULL, blank=True, null=True)
     state = FSMField(default='created')
     created = models.DateTimeField(auto_now_add=True, editable=False)
     updated = models.DateTimeField(auto_now=True)
@@ -73,17 +88,42 @@ def create_ocr_task(sender, instance, created, **kwargs):
         doc.create_ocr_task()
 
 
-class OcrResult(models.Model):
+class OcrFile(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    ocr_document = models.OneToOneField(OcrDocument, on_delete=models.CASCADE, blank=False)
-    scanned_data = JSONField()
+    document = models.FileField(blank=False, null=False)
+    callback_url = models.URLField(blank=True)
+    priority = models.IntegerField(default=10, blank=True)
     state = FSMField(default='created')
+    ocr_result = models.ForeignKey(OcrResult, on_delete=models.SET_NULL, blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True, editable=False)
     updated = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = "OCR Result"
-        verbose_name_plural = "OCR Results"
+        verbose_name = "OCR File"
+        verbose_name_plural = "OCR Files"
 
     def __str__(self):
         return '{}'.format(self.id)
+
+    def create_ocr_task(self):
+        current_app.send_task('blueocr.ocr.tasks.scan_file', args=(self.id,))
+
+    @transition(field=state, source='created', target='processed', on_error='error')
+    def enter_processed(self):
+        pass
+
+    @transition(field=state, source='created', target='failed', on_error='error')
+    def enter_failed(self):
+        pass
+
+    def download(self):
+        return os.path.join(settings.MEDIA_ROOT, str(self.document))
+
+
+@receiver(post_save, sender=OcrFile)
+def create_ocr_file_task(sender, instance, created, **kwargs):
+    if created:
+        doc = instance
+        doc.create_ocr_task()
+
+
