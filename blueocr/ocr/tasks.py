@@ -34,6 +34,8 @@ def scan_document(document_id):
                 converted_file = convert_to_image(download_file)
                 os.remove(download_file)
                 download_file = converted_file
+            # to decide if we want to keep this here!!
+            create_contour_image(download_file)
             mrz = read_mrz(download_file)
             if mrz is None or mrz.valid_score < 70:
                 create_contour_image(download_file)
@@ -78,6 +80,8 @@ def scan_file(file_id):
                 converted_file = convert_to_image(download_file)
                 os.remove(download_file)
                 download_file = converted_file
+            #to decide if we want to keep this here!!
+            create_contour_image(download_file)
             mrz = read_mrz(download_file)
             if mrz is None or mrz.valid_score < 70:
                 create_contour_image(download_file)
