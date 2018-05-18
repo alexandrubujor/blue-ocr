@@ -88,9 +88,9 @@ def create_ocr_task(sender, instance, created, **kwargs):
         doc.create_ocr_task()
 
 
-class OcrFile(models.Model):
+class OcrUploadedFile(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    document = models.FileField(blank=False, null=False)
+    file = models.FileField(blank=False, null=False)
     callback_url = models.URLField(blank=True)
     priority = models.IntegerField(default=10, blank=True)
     state = FSMField(default='created')
@@ -117,10 +117,10 @@ class OcrFile(models.Model):
         pass
 
     def download(self):
-        return os.path.join(settings.MEDIA_ROOT, str(self.document))
+        return os.path.join(settings.MEDIA_ROOT, str(self.file))
 
 
-@receiver(post_save, sender=OcrFile)
+@receiver(post_save, sender=OcrUploadedFile)
 def create_ocr_file_task(sender, instance, created, **kwargs):
     if created:
         doc = instance

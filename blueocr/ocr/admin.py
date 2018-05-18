@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import OcrDocument, OcrResult, OcrFile
+from .models import OcrDocument, OcrResult, OcrUploadedFile
 
 
 class OcrDocumentAdmin(admin.ModelAdmin):
@@ -13,6 +13,6 @@ class OcrResultAdmin(admin.ModelAdmin):
 
 
 admin.site.register(OcrDocument, OcrDocumentAdmin)
-admin.site.register(OcrFile)
+admin.site.register(OcrUploadedFile)
 admin.site.register(OcrResult, OcrResultAdmin)
 

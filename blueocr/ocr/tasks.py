@@ -1,7 +1,7 @@
 # Create your tasks here
 from __future__ import absolute_import, unicode_literals
 from blueocr.ocr.celeryapp import app
-from blueocr.ocr.models import OcrDocument, OcrResult, OcrFile
+from blueocr.ocr.models import OcrDocument, OcrResult, OcrUploadedFile
 from blueocr.ocr.utils import adjust_data, is_image, convert_to_image
 from django.core import serializers
 from passporteye import read_mrz
@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 
 @app.task
 def scan_document(document_id):
+    from blueocr.ocr.utils import create_contour_image
     doc = OcrDocument.objects.get(id=document_id)
     try:
         download_file = doc.download()
@@ -34,6 +35,9 @@ def scan_document(document_id):
                 os.remove(download_file)
                 download_file = converted_file
             mrz = read_mrz(download_file)
+            if mrz is None or mrz.valid_score < 70:
+                create_contour_image(download_file)
+                mrz = read_mrz(download_file)
             if mrz is None:
                 raise Exception("MRZ zone not identified")
         except Exception as e:
@@ -56,7 +60,8 @@ def scan_document(document_id):
 
 @app.task
 def scan_file(file_id):
-    doc = OcrFile.objects.get(id=file_id)
+    from blueocr.ocr.utils import create_contour_image
+    doc = OcrUploadedFile.objects.get(id=file_id)
     try:
         download_file = doc.download()
         logger.info("Downloaded file to {}".format(download_file))
@@ -74,6 +79,9 @@ def scan_file(file_id):
                 os.remove(download_file)
                 download_file = converted_file
             mrz = read_mrz(download_file)
+            if mrz is None or mrz.valid_score < 70:
+                create_contour_image(download_file)
+                mrz = read_mrz(download_file)
             if mrz is None:
                 raise Exception("MRZ zone not identified")
         except Exception as e:
@@ -108,7 +116,7 @@ def send_callback(document_id):
 
 @app.task
 def send_file_callback(document_id):
-    doc = OcrFile.objects.get(id=document_id)
+    doc = OcrUploadedFile.objects.get(id=document_id)
     result = doc.ocr_result
     if doc.callback_url is None or doc.callback_url is "":
         logger.info("No callback to be executed for {}".format(doc))

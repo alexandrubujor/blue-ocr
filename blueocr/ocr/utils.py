@@ -40,6 +40,19 @@ def convert_to_image(download_file):
     return tiff_image
 
 
+def create_contour_image(image_file):
+    import cv2
+    logger.debug("Importing CV2")
+    img = cv2.imread(image_file)
+    logger.debug("Image read by CV2")
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    ret, thresh = cv2.threshold(gray, 127, 255, 0)
+    im2, contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    logger.debug("Created Contour Image")
+    cv2.imwrite(image_file, im2)
+    logger.info("Saved new Contour image")
+
+
 def get_swift_token():
     from keystoneauth1.identity import v3
     from keystoneauth1 import session

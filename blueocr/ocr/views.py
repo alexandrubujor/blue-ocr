@@ -1,6 +1,6 @@
 from rest_framework import generics, permissions
-from .models import OcrDocument, OcrResult, OcrFile
-from .serializers import OcrDocumentSerializer, OcrResultSerializer, OcrFileSerializer
+from .models import OcrDocument, OcrResult, OcrUploadedFile
+from .serializers import OcrDocumentSerializer, OcrResultSerializer, OcrUploadedFileSerializer
 from rest_framework.permissions import AllowAny
 
 
@@ -18,17 +18,17 @@ class OcrDocumentDetail(generics.RetrieveDestroyAPIView):
     permission_classes = (AllowAny,)
 
 
-class OcrFileList(generics.ListCreateAPIView):
-    model = OcrFile
-    serializer_class = OcrFileSerializer
-    queryset = OcrFile.objects.all()
+class OcrUploadedFileList(generics.ListCreateAPIView):
+    model = OcrUploadedFile
+    serializer_class = OcrUploadedFileSerializer
+    queryset = OcrUploadedFile.objects.all()
     permission_classes = (AllowAny,)
 
 
-class OcrFileDetail(generics.RetrieveDestroyAPIView):
-    model = OcrFile
-    serializer_class = OcrFileSerializer
-    queryset = OcrFile.objects.all()
+class OcrUploadedFileDetail(generics.RetrieveDestroyAPIView):
+    model = OcrUploadedFile
+    serializer_class = OcrUploadedFileSerializer
+    queryset = OcrUploadedFile.objects.all()
     permission_classes = (AllowAny,)
 
 

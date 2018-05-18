@@ -42,3 +42,7 @@ django-fsm==2.6.0
 PassportEye==1.2.0
 
 python-keystoneclient==3.16.0
+
+eventlet==0.23.0
+
+opencv-python==3.4.0.14

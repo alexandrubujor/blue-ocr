@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from blueocr.ocr.models import OcrDocument, OcrResult, OcrFile
+from blueocr.ocr.models import OcrDocument, OcrResult, OcrUploadedFile
 
 
 class OcrDocumentSerializer(serializers.ModelSerializer):
@@ -10,11 +10,11 @@ class OcrDocumentSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'state', 'ocr_result', 'created', 'updated')
 
 
-class OcrFileSerializer(serializers.ModelSerializer):
+class OcrUploadedFileSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = OcrFile
-        fields = ('id', 'document', 'callback_url', 'priority', 'state', 'ocr_result', 'created', 'updated')
+        model = OcrUploadedFile
+        fields = ('id', 'file', 'callback_url', 'priority', 'state', 'ocr_result', 'created', 'updated')
         read_only_fields = ('id', 'state', 'ocr_result', 'created', 'updated')
 
 
