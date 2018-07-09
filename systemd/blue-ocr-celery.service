@@ -1,0 +1,13 @@
+[Unit]
+Description=Bluedrive OCR Celery Service
+After=syslog.target
+
+[Service]
+WorkingDirectory=/opt/bluedrive/blue-ocr
+SyslogIdentifier=BlueOcrCelery
+ExecStart=/opt/bluedrive/p3-venv/bin/python /opt/bluedrive/p3-venv/bin/celery worker -P eventlet --maxtasksperchild 10 --app=blueocr.ocr.celeryapp
+User=bluedrive
+Type=simple
+
+[Install]
+WantedBy=multi-user.target

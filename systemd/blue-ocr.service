@@ -1,0 +1,13 @@
+[Unit]
+Description=Bluedrive OCR Service
+After=syslog.target
+
+[Service]
+WorkingDirectory=/opt/bluedrive/blue-ocr
+SyslogIdentifier=BlueOcr
+ExecStart=/opt/bluedrive/p3-venv/bin/python /opt/bluedrive/blue-ocr/manage.py runserver 0.0.0.0:8091
+User=bluedrive
+Type=simple
+
+[Install]
+WantedBy=multi-user.target
