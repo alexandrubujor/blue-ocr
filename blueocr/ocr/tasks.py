@@ -4,6 +4,7 @@ from blueocr.ocr.celeryapp import app
 from blueocr.ocr.models import OcrDocument, OcrResult, OcrUploadedFile
 from blueocr.ocr.utils import adjust_data, is_image, convert_to_image
 from django.core import serializers
+from datetime import datetime
 from passporteye import read_mrz
 import json
 import os

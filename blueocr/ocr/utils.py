@@ -3,6 +3,7 @@ import imghdr
 import subprocess
 import logging
 import shlex
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +19,14 @@ def adjust_data(data_dict):
             data_dict['sex'] = 'M'
         if s in "PR":
             data_dict['sex'] = 'F'
+    if 'expiration_date' in keys:
+        logger.info("Processing expiration date")
+        date = datetime.strptime(data_dict['expiration_date'], '%y%m%d')
+        data_dict['expiration_date'] = date.strftime("%Y-%m-%d")
+    if 'date_of_birth' in keys:
+        logger.info("Processing date of birth")
+        date = datetime.strptime(data_dict['date_of_birth'], '%y%m%d')
+        data_dict['date_of_birth'] = date.strftime("%Y-%m-%d")
 
 
 def is_image(filename):
