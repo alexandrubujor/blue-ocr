@@ -27,6 +27,9 @@ def adjust_data(data_dict):
         logger.info("Processing date of birth")
         date = datetime.strptime(data_dict['date_of_birth'], '%y%m%d')
         data_dict['date_of_birth'] = date.strftime("%Y-%m-%d")
+    if 'personal_number' not in keys and 'number' in keys:
+        data_dict['personal_number'] = data_dict['number']
+
 
 
 def is_image(filename):
