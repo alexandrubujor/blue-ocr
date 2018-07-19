@@ -17,7 +17,7 @@ A Django-based REST API for extracting data from scanned Passports and IDs (with
 2. Create PostgreSQL database and credentials
 3. Create RabbitMQ virtualhost and credentials
 4. Perform configurations in blueocr/config/common.py. Make sure you configure correctly the following:
-```json
+```
     CELERY_BROKER_URL = "pyamqp://blueocr:blueocr@127.0.0.1:5672//"
     TEMP_DOWNLOADS = "/tmp/"
     CONVERT_SHELL = "/Users/alexandru.bujor/work/bluedrive/ocr/convert.sh"
