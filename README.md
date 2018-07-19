@@ -11,6 +11,48 @@ A Django-based REST API for extracting data from scanned Passports and IDs (with
 * Supply documents (images or PDFs) via URLs. Will be downloaded and processed by the API
 * Process documents asynchronously and send callbacks for a snappy interaction
 
+# Deployment
+
+1. Checkout this code
+2. Create PostgreSQL database and credentials
+3. Create RabbitMQ virtualhost and credentials
+4. Perform configurations in blueocr/config/common.py. Make sure you configure correctly the following:
+```json
+    CELERY_BROKER_URL = "pyamqp://blueocr:blueocr@127.0.0.1:5672//"
+    TEMP_DOWNLOADS = "/tmp/"
+    CONVERT_SHELL = "/Users/alexandru.bujor/work/bluedrive/ocr/convert.sh"
+    SWIFT_USERNAME = "admin"
+    SWIFT_PASSWORD = "XXXXXXXXX"
+    SWIFT_PROJECT_NAME = "admin"
+    SWIFT_USER_DOMAIN = "default"
+    SWIFT_PROJECT_DOMAIN = "default"
+    SWIFT_KEYSTONE_URL = "http://5.154.188.179:5000/v3/"
+    
+    DATABASES = {
+        'default': dj_database_url.config(
+            default='postgres://blueocr:blueocr@127.0.0.1:5432/blueocr',
+            conn_max_age=int(os.getenv('POSTGRES_CONN_MAX_AGE', 600))
+        )
+    }
+```
+5. Create migrations
+```bash
+python manage.py makemigrations
+```
+
+6. Execute migrations
+```bash
+python manage.py migrate
+```
+
+7. Create an admin user for management purposes
+```bash
+python manage.py createsuperuser
+```
+
+8. Copy systemd scripts from systemd folder to proper locations. Check if the service files are OK for you first!
+9. Start and enable the services with systemd
+
 # REST Methods
 
 ### Send DOC for processing
@@ -130,7 +172,7 @@ GET http://127.0.0.1:8080/api/v1/ocr/ocrresult/fdbac46e-4482-43dd-90ac-9f0d96aa7
 * Celery (for async tasks)
 * [PassportEye](https://github.com/konstantint/PassportEye) (for ID processing)
 
-# Contact & support
+# Contact
 
 * email: alexandru.bujor at bluedrive.ro
 * web: www.bluedrive.ro
