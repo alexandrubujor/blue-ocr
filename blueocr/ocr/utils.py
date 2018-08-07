@@ -21,12 +21,20 @@ def adjust_data(data_dict):
             data_dict['sex'] = 'F'
     if 'expiration_date' in keys:
         logger.info("Processing expiration date")
-        date = datetime.strptime(data_dict['expiration_date'], '%y%m%d')
-        data_dict['expiration_date'] = date.strftime("%Y-%m-%d")
+        try:
+            date = datetime.strptime(data_dict['expiration_date'], '%y%m%d')
+            data_dict['expiration_date'] = date.strftime("%Y-%m-%d")
+        except ValueError:
+            data_dict['expiration_date'] = ""
+            logger.info("Could not recognize data.")
     if 'date_of_birth' in keys:
         logger.info("Processing date of birth")
-        date = datetime.strptime(data_dict['date_of_birth'], '%y%m%d')
-        data_dict['date_of_birth'] = date.strftime("%Y-%m-%d")
+        try:
+            date = datetime.strptime(data_dict['date_of_birth'], '%y%m%d')
+            data_dict['date_of_birth'] = date.strftime("%Y-%m-%d")
+        except ValueError:
+            data_dict['date_of_birth'] = ""
+            logger.info("Could not recognize data.")
     pn = data_dict.get('personal_number')
     if pn is None or pn == "" and 'number' in keys:
         data_dict['personal_number'] = data_dict['number']
