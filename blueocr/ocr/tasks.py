@@ -36,6 +36,7 @@ def scan_document(document_id):
                 download_file = converted_file
             mrz = read_mrz(download_file)
             if mrz is None or mrz.valid_score < 70:
+                logger.warning("MRZ valid score bellow threshold. Performing step 2.")
                 create_contour_image(download_file)
                 mrz = read_mrz(download_file)
             if mrz is None:
@@ -80,6 +81,7 @@ def scan_file(file_id):
                 download_file = converted_file
             mrz = read_mrz(download_file)
             if mrz is None or mrz.valid_score < 70:
+                logger.warning("MRZ valid score bellow threshold. Performing step 2.")
                 create_contour_image(download_file)
                 mrz = read_mrz(download_file)
             if mrz is None:
