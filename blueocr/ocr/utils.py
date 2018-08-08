@@ -8,6 +8,15 @@ from datetime import datetime
 logger = logging.getLogger(__name__)
 
 
+def is_pn_invalid(personal_number):
+    if personal_number is None or personal_number == "":
+        return True
+    if "<" in personal_number:
+        return True
+    if len(personal_number) < 4:
+        return True
+
+
 def adjust_data(data_dict):
     keys = data_dict.keys()
     for key in keys:
@@ -36,7 +45,7 @@ def adjust_data(data_dict):
             data_dict['date_of_birth'] = ""
             logger.info("Could not recognize data.")
     pn = data_dict.get('personal_number')
-    if pn is None or pn == "" and 'number' in keys:
+    if is_pn_invalid(pn) and 'number' in keys:
         data_dict['personal_number'] = data_dict['number']
 
 
