@@ -4,7 +4,6 @@ from blueocr.ocr.celeryapp import app
 from blueocr.ocr.models import OcrDocument, OcrResult, OcrUploadedFile
 from blueocr.ocr.utils import adjust_data, is_image, convert_to_image
 from django.core import serializers
-from datetime import datetime
 from passporteye import read_mrz
 import json
 import os
@@ -36,7 +35,7 @@ def scan_document(document_id):
                 os.remove(download_file)
                 download_file = converted_file
             mrz = read_mrz(download_file)
-            if mrz is None or mrz.valid_score < 20:
+            if mrz is None or mrz.valid_score < 50:
                 create_contour_image(download_file)
                 mrz = read_mrz(download_file)
             if mrz is None:
@@ -80,7 +79,7 @@ def scan_file(file_id):
                 os.remove(download_file)
                 download_file = converted_file
             mrz = read_mrz(download_file)
-            if mrz is None or mrz.valid_score < 20:
+            if mrz is None or mrz.valid_score < 50:
                 create_contour_image(download_file)
                 mrz = read_mrz(download_file)
             if mrz is None:
