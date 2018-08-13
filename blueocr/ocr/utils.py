@@ -3,9 +3,28 @@ import imghdr
 import subprocess
 import logging
 import shlex
+import pycountry
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
+
+
+def check_countries(mrz):
+    nationality_country = mrz.nationality
+    country = mrz.country
+    try:
+        pycountry.countries.get(alpha_3=nationality_country)
+        pycountry.countries.get(alpha_3=country)
+    except Exception:
+        return False
+    return True
+
+
+def custom_check(mrz):
+    if mrz is None:
+        return
+    if check_countries(mrz):
+        mrz.valid_score = mrz.valid_score + 50
 
 
 def is_pn_invalid(personal_number):

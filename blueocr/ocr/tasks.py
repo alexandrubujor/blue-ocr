@@ -2,7 +2,7 @@
 from __future__ import absolute_import, unicode_literals
 from blueocr.ocr.celeryapp import app
 from blueocr.ocr.models import OcrDocument, OcrResult, OcrUploadedFile
-from blueocr.ocr.utils import adjust_data, is_image, convert_to_image
+from blueocr.ocr.utils import adjust_data, is_image, convert_to_image, custom_check
 from django.core import serializers
 from passporteye import read_mrz
 import json
@@ -35,10 +35,13 @@ def scan_document(document_id):
                 os.remove(download_file)
                 download_file = converted_file
             mrz = read_mrz(download_file)
+            custom_check(mrz)
+            mrz1 = mrz
             if mrz is None or mrz.valid_score < 70:
                 logger.warning("MRZ valid score bellow threshold. Performing step 2.")
                 create_contour_image(download_file)
                 mrz = read_mrz(download_file)
+                custom_check(mrz)
             if mrz is None:
                 raise Exception("MRZ zone not identified")
         except Exception as e:
@@ -48,6 +51,8 @@ def scan_document(document_id):
             doc.ocr_result = result
             doc.save()
         else:
+            if mrz1 is not None and mrz1.valid_score > mrz.valid_score:
+                mrz = mrz1
             mrz_dict = mrz.to_dict()
             adjust_data(mrz_dict)
             result = OcrResult.objects.create(state='completed', scanned_data=mrz_dict)
@@ -80,10 +85,15 @@ def scan_file(file_id):
                 os.remove(download_file)
                 download_file = converted_file
             mrz = read_mrz(download_file)
+            custom_check(mrz)
+            print(mrz.to_dict())
+            mrz1 = mrz
             if mrz is None or mrz.valid_score < 70:
                 logger.warning("MRZ valid score bellow threshold. Performing step 2.")
                 create_contour_image(download_file)
                 mrz = read_mrz(download_file)
+                custom_check(mrz)
+                print(mrz.to_dict())
             if mrz is None:
                 raise Exception("MRZ zone not identified")
         except Exception as e:
@@ -93,6 +103,8 @@ def scan_file(file_id):
             doc.ocr_result = result
             doc.save()
         else:
+            if mrz1 is not None and mrz1.valid_score > mrz.valid_score:
+                mrz = mrz1
             mrz_dict = mrz.to_dict()
             adjust_data(mrz_dict)
             result = OcrResult.objects.create(state='completed', scanned_data=mrz_dict)
